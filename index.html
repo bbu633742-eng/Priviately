@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privately</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b141a;font-family:sans-serif;color:#fff;height:100dvh;display:flex;flex-direction:column}
+header{background:#1f2c34;padding:14px;font-weight:bold}
+header small{display:block;font-weight:normal;color:#8696a0;font-size:12px}
+#chat{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:6px}
+.b{max-width:78%;padding:8px 12px;border-radius:12px;font-size:15px;line-height:1.4}
+.them{background:#1f2c34;align-self:flex-start}
+.me{background:#005c4b;align-self:flex-end}
+.sys{align-self:center;color:#8696a0;font-size:12px;margin:6px;text-align:center}
+#choices{padding:10px;display:flex;flex-direction:column;gap:8px;background:#111b21}
+#choices button{background:#202c33;color:#fff;border:1px solid #005c4b;border-radius:20px;padding:12px;font-size:15px}
+</style></head><body>
+<header><span id="hn">Chairman Lee</span><small id="hs">online</small></header>
+<div id="chat"></div>
+<div id="choices"></div>
+<script>
+const story={
+
+/* ===== PROLOGUE: HOW HE BECAME CEO ===== */
+start:{head:"Chairman Lee (Father)",msgs:[
+["sys","PROLOGUE\n10 years ago, 9:12 PM"],
+["them","Donghyuck, the board votes tomorrow."],
+["them","Lee Group needs a leader. I am getting old, and your uncles want the company."],
+["them","Are you ready?"]],
+choices:[["I'm ready, Father.","ready"],["I never wanted this.","never"]]},
+
+ready:{head:"Chairman Lee (Father)",msgs:[
+["me","I'm ready, Father."],
+["them","Good. Then remember this: don't trust anyone easily."],
+["them","Not the board. Not the staff."]],
+choices:[["Even family?","family"],["Understood.","vote"]]},
+
+never:{head:"Chairman Lee (Father)",msgs:[
+["me","I never wanted this."],
+["them","Nobody wants it. That is why it must be you."],
+["them","You care about people. That is rare in this business."]],
+choices:[["...Fine. I'll do it.","vote"],["And if I fail?","family"]]},
+
+family:{head:"Chairman Lee (Father)",msgs:[
+["me","Even family?"],
+["them","Especially family."],
+["them","Your uncles smile at dinner and count shares in their heads."],
+["them","Be strong tomorrow. Don't let them see you doubt."]],
+choices:[["I won't.","vote"]]},
+
+vote:{head:"Lawyer Kim",msgs:[
+["sys","Next day, 4:40 PM"],
+["them","Mr. Lee. The board has voted."],
+["them","Congratulations, CEO Lee Donghyuck. The youngest CEO in company history. 👏"],
+["them","Your uncles walked out without a word."]],
+choices:[["Make sure they never doubt me again.","coldway"],["I'll earn their respect with hard work.","warmway"]]},
+
+coldway:{head:"Lawyer Kim",msgs:[
+["me","Make sure they never doubt me again."],
+["them","Understood, sir."],
+["sys","Within a year, the staff gave him a nickname: 'The Scary Boss.'"]],
+choices:[["Continue ➜","monday"]]},
+
+warmway:{head:"Lawyer Kim",msgs:[
+["me","I'll earn their respect with hard work."],
+["them","Admirable, sir. But this industry is not kind."],
+["sys","Years of betrayals later, his smile disappeared. The staff called him 'The Scary Boss.'"]],
+choices:[["Continue ➜","monday"]]},
+
+/* ===== MAIN STORY ===== */
+monday:{head:"Park Yejin",msgs:[
+["sys","10 YEARS LATER\nMonday, 07:45 AM"],
+["them","Good morning, Mr. Lee."],
+["them","Mina's first birthday is tomorrow. Shall I clear your schedule?"]],
+choices:[["Clear everything.","clear"],["Keep the 10 AM meeting.","meeting"]]},
+
+clear:{msgs:[
+["me","Clear everything."],
+["them","All of it? Even the investor meeting?"],
+["them","The staff will be shocked. 😳"]],
+choices:[["I don't care.","care"],["Fine, move it to 8 PM.","late"]]},
+
+meeting:{msgs:[
+["me","Keep the 10 AM meeting."],
+["them","Understood."],
+["them","...But Mina's party starts at 11, sir."]],
+choices:[["Then end it early.","care"],["I'll make it on time.","late"]]},
+
+care:{msgs:[
+["me","I don't care. She turns one only once."],
+["them","I see a different side of you today, sir. 🙂"],
+["them","Should I order the cake and balloons too?"]],
+choices:[["Yes. The biggest cake.","good"],["Do it quietly. Nobody must know.","secret"]]},
+
+late:{msgs:[
+["me","Move it to 8 PM. I'll handle it."],
+["them","Sir, you said that last year too."],
+["them","Mina won't remember a late uncle. But I will."]],
+choices:[["...You're right. Clear it.","good"],["Just do your job, Yejin.","cold"]]},
+
+good:{msgs:[
+["sys","ENDING: Warm Uncle"],
+["them","Everything is arranged. The 'scary boss' has a soft spot after all. 🎂"]],end:true},
+
+secret:{msgs:[
+["sys","ENDING: Secret Softie"],
+["them","Your secret is safe with me, sir. Though the whole office already knows. 😂"]],end:true},
+
+cold:{msgs:[
+["me","Just do your job, Yejin."],
+["sys","Yejin is typing..."],
+["them","Yes, sir."],
+["sys","ENDING: Scary Boss"]],end:true}
+};
+
+const chat=document.getElementById("chat"),box=document.getElementById("choices");
+const hn=document.getElementById("hn");
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+function add(t,x){const d=document.createElement("div");
+d.className=t==="sys"?"sys":"b "+t;d.textContent=x;
+if(t==="sys")d.style.whiteSpace="pre-line";
+chat.appendChild(d);chat.scrollTop=chat.scrollHeight;}
+
+async function play(id){
+const s=story[id];box.innerHTML="";
+if(s.head)hn.textContent=s.head;
+for(const [t,x] of s.msgs){
+if(t==="them")await wait(900);
+add(t,x);}
+if(s.end){const b=document.createElement("button");b.textContent="Play again";
+b.onclick=()=>{chat.innerHTML="";play("start")};box.appendChild(b);return;}
+s.choices.forEach(([label,next])=>{
+const b=document.createElement("button");b.textContent=label;
+b.onclick=()=>play(next);box.appendChild(b);});
+}
+play("start");
+</script></body></html>
